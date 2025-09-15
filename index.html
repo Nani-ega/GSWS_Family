@@ -1,0 +1,1153 @@
+﻿<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GSWS Family</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#667eea">
+
+  <link rel="icon" href="assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-512.png" />
+
+  <script src="assets/supabase.min.js"></script>
+  <script src="/env.js"></script>
+
+    <!-- Leaflet CSS/JS loaded up-front for reliability -->
+   <link rel="stylesheet" href="assets/leaflet.css" />
+  <script src="assets/leaflet.js"></script>
+
+  <style>*{margin:0;padding:0;box-sizing:border-box}
+
+body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      color: #333;
+    }
+    /* Splash screen layout */
+#splashScreen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* gradient blue */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  color: white;
+  text-align: center;
+}
+
+/* Logo */
+#splashLogo {
+  width: 150px;
+  height: 150px;
+  opacity: 0;
+  animation: fadeInZoom 2s ease forwards, fadeOut 1s ease 3s forwards;
+}
+
+/* Credits */
+#splashCredits {
+  position: absolute;
+  bottom: 20px;
+  font-size: 14px;
+  opacity: 0;
+  animation: fadeIn 2s ease forwards 1s, fadeOut 1s ease 3s forwards;
+}
+
+/* Animations */
+@keyframes fadeInZoom {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeOut {
+  to { opacity: 0; }
+}
+
+  
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:#333}
+.screen{display:none;min-height:100vh;padding:20px}
+.screen.active{display:block}
+.container{max-width:420px;margin:0 auto;background:rgba(255,255,255,0.95);border-radius:20px;padding:40px;box-shadow:0 20px 40px rgba(0,0,0,0.1);backdrop-filter:blur(10px);min-height:500px;display:flex;flex-direction:column;justify-content:center}
+.wide-container{width:100%;max-width:980px;margin:8px auto;background:rgba(255,255,255,0.95);
+      border-radius:14px;padding:16px;box-shadow:0 20px 40px rgba(0,0,0,0.12);
+}
+.full-container{width:100%;max-width:980px;margin:8px auto;background:rgba(255,255,255,0.95);
+      border-radius:14px;padding:16px;box-shadow:0 20px 40px rgba(0,0,0,0.12);
+}
+h1,h2{text-align:center;margin-bottom:20px;color:#333}
+h1{font-size:2em;font-weight:300}
+h2{font-size:1.2em;font-weight:500;word-wrap:break-word}
+.form-group{margin-bottom:20px}
+input,select{width:100%;padding:15px;border:2px solid #e1e5e9;border-radius:10px;font-size:16px;transition:all 0.3s ease}
+input:focus,select:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}
+.btn{padding:12px 18px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.3s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(102,126,234,0.3)}
+.btn-small{padding:6px 10px;font-size:13px}
+.nav-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:0 10px}
+.back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:#667eea;margin-right:10px;padding:6px;border-radius:50%;transition:all 0.3s ease}
+.back-btn:hover{background:rgba(102,126,234,0.1)}
+.dashboard-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin:15px 0}
+.stat-card{background:white;padding:15px;border-radius:15px;text-align:center;box-shadow:0 5px 15px rgba(0,0,0,0.1);cursor:pointer;transition:all 0.3s ease}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(102,126,234,0.15)}
+.stat-number{font-size:1.4em;font-weight:bold;color:#667eea}
+.stat-label{font-size:0.85em;color:#666;margin-top:5px}
+#familySearch{width:100%;padding:12px;border:2px solid #e1e5e9;border-radius:10px;font-size:15px;margin-bottom:15px}
+.family-card{background:white;padding:12px;border-radius:10px;margin:8px 0;box-shadow:0 3px 10px rgba(0,0,0,0.1);cursor:pointer;transition:all 0.3s ease;word-wrap:break-word;white-space:normal}
+.family-card:hover{transform:translateY(-2px);box-shadow:0 5px 20px rgba(0,0,0,0.15)}
+.family-members-count{text-align:center;font-size:1.1em;font-weight:bold;color:#764ba2;margin:6px 0}
+.table-container{overflow:auto;margin-top:10px}
+table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.1)}
+th,td{padding:10px;text-align:left;border-bottom:1px solid #e1e5e9;white-space:nowrap}
+th{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;font-weight:600;font-size:0.8em}
+td{font-size:0.85em}
+.door-display{margin-top:12px;padding:10px;background:white;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.08);font-size:0.9em}
+.detail-card{background:white;padding:15px;border-radius:15px;margin:10px 0;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.detail-row:last-child{border-bottom:none}
+.detail-label{font-weight:600;color:#555;flex:1}
+.detail-value{flex:2;text-align:right;color:#333}
+.edit-input{width:100%;padding:6px;border:1px solid #ddd;border-radius:5px;font-size:13px}
+.edit-buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
+.pension-tiles-grid {
+
+display: flex; flex-direction: column; gap: 18px; margin-top: 8px; } .pension-tile { background: #fff; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid rgba(0,0,0,0.04); transition: transform 0.2s ease, box-shadow 0.2s ease; } .pension-tile:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,0.12); } .pension-tile-header { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); /* ✅ same as table heading */ color: #fff; padding: 8px 12px; font-weight: 700; display:flex; justify-content:space-between; align-items:center; } .pension-tile-body { padding: 12px; } .pension-tile-info { font-size: 14px; line-height: 1.5; color: #111; } .pension-tile-info b { font-weight:700 } 
+/* Family screen heading (Cluster, HH ID, Head Name) */
+#familyTitle {
+  flex: 1;                  /* take full width between back + logout */
+  text-align: center;       /* center text */
+  font-size: 1.1em;          /* slightly smaller to fit better */
+  font-weight: 600;          /* bold */
+  color: #667eea;            /* theme blue/purple */
+  line-height: 1.4;          /* more breathing space between lines */
+  padding: 0 6px;
+  word-break: break-word;    /* allow breaks inside long strings */
+  white-space: normal;       /* allow wrapping */
+}
+.manual-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: none; /* 👈 hide by default */
+  align-items: center; justify-content: center;
+  z-index: 9999;
+}
+
+.manual-modal.active { display: flex; }
+
+.manual-modal-content {
+  background: white; border-radius: 10px; width: 90%; max-width: 700px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+.manual-modal.active { display:flex; }
+
+
+@media(max-width:768px){
+  .container{padding:12px;border-radius:10px}
+  .manual-modal{width:96%;height:92vh;}
+  .manual-modal #manual-map{height:calc(92vh - 60px)!important}
+  table,th,td{font-size:13px}
+} h2{font-size:1.1em}  </style>
+
+</head>
+<body>
+    <!-- Splash -->
+  <div id="splashScreen">
+    <img src="assets/icons/icon-512.png" alt="App Logo" id="splashLogo" />
+    <p id="splashCredits">Developed by okA DA<br>GSWS @ v1.0</p>
+  </div>
+  <div id="app" style="display:none;">
+  <!-- Login --><div id="loginScreen" class="screen active">
+  <div class="container">
+    <h1>GSWS Family</h1>
+    <div class="form-group"><input type="text" id="username" placeholder="Enter Username"></div>
+    <div class="form-group"><input type="password" id="password" placeholder="Enter Password"></div>
+    <button class="btn" onclick="login()">Login</button>
+    <div id="loginError" style="color:red;margin-top:10px;"></div>
+  </div>
+</div>  <!-- Dashboard -->  <div id="dashboardScreen" class="screen">
+    <div class="container">
+      <h1>Welcome</h1>
+      <div style="display:flex;justify-content:center;gap:30px;margin-top:40px;">
+        <div class="stat-card" onclick="showClusterScreenFromDashboard()">
+          <div class="stat-number"><span>&#128101;</span></div>
+          <div class="stat-label">Family Members</div>
+        </div>
+        <div class="stat-card" onclick="showPensionScreenFromDashboard()">
+            <div class="stat-number"><span>&#128179;</span></div>
+            <div class="stat-label">Pensioners</div>
+        </div>
+      </div>
+      <button class="btn" style="margin-top:40px;" onclick="logout()">Logout</button>
+    </div>
+  </div>  <!-- Cluster -->  <div id="clusterScreen" class="screen">
+    <div class="container wide-container">
+      <div class="nav-header">
+        <button class="back-btn" onclick="showDashboardScreen()">&larr;</button>
+        <h2>Select Cluster</h2>
+        <button class="btn btn-small" onclick="logout()">Logout</button>
+      </div>
+      <select id="clusterSelect" onchange="loadClusterData()">
+        <option value="">Choose Cluster...</option>
+      </select>
+      <input type="text" id="familySearch" placeholder="Search families..." oninput="filterFamilies()">
+      <div id="clusterDashboard" style="display:none;">
+        <div class="dashboard-stats">
+          <div class="stat-card"><div class="stat-number" id="totalFamilies">0</div><div class="stat-label">Total Families</div></div>
+          <div class="stat-card"><div class="stat-number" id="totalMembers">0</div><div class="stat-label">Total Members</div></div>
+        </div>
+      </div>
+      <div id="familiesContainer"></div>
+    </div>
+  </div>  <!-- Family Members -->  <div id="membersScreen" class="screen">
+    <div class="container full-container">
+      <div class="nav-header">
+        <button class="back-btn" onclick="showClusterScreen()">&larr;</button>
+        <h2 id="familyTitle">Family Members</h2>
+        <button class="btn btn-small" onclick="logout()">Logout</button>
+      </div>
+      <div class="table-container">
+        <div id="membersTable"></div>
+      </div>
+      <div id="doorNumberDisplay" class="door-display"></div>
+      <div id="familyMapContainer"></div>
+    </div>
+  </div>  <!-- Pensioners Home Tile Screen --><div id="pensionScreen" class="screen">
+  <div class="container wide-container">
+    <div class="nav-header">
+      <button class="back-btn" onclick="showDashboardScreen()">&larr;</button>
+      <h2>Pensioners</h2>
+      <button class="btn btn-small" onclick="logout()">Logout</button>
+    </div>
+    <input type="text" id="pensionSearch" placeholder="Search pensioners..." oninput="filterPensioners()" style="margin-bottom:15px;">
+    <div id="pensionTotal" style="margin-bottom:10px;font-weight:bold;color:#667eea;"></div>
+    <div id="pensionTilesContainer"></div>
+  </div>
+</div><!-- Pensioners Cluster Table Screen --><div id="pensionClusterScreen" class="screen">
+  <div class="container wide-container">
+    <div class="nav-header">
+      <button class="back-btn" onclick="showPensionScreen()">&larr;</button>
+      <h2 id="pensionClusterTitle">Pensioners - Detail</h2>
+      <button class="btn btn-small" onclick="logout()">Logout</button>
+    </div>
+    <div class="table-container">
+      <div id="pensionClusterTable"></div>
+    </div>
+    <div id="pensionDetailMapContainer"></div>
+  </div>
+</div>  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener('load', () => {
+      navigator.serviceWorker.register("/sw.js")
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.error("❌ SW registration failed:", err));
+      });
+    }
+    const SUPABASE_URL = window.env.SUPABASE_URL;
+    const SUPABASE_KEY = window.env.SUPABASE_ANON_KEY; 
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let familyData = [], familiesMap = {}, currentCluster = null, currentFamily = null, subscription = null;
+
+    // Pensioners data
+    let pensionersData = [], filteredPensioners = [];
+
+    function showScreen(id){
+      document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    async function login(){
+      let username=document.getElementById("username").value.trim();
+      let password=document.getElementById("password").value.trim();
+      let email = username + "@gsws.com";
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+      if(error){
+        document.getElementById("loginError").innerText="Invalid login";
+        return;
+      }
+      currentUser = data.user;
+      showScreen("dashboardScreen");
+      subscribeRealtime();
+    }
+
+    function logout(){
+      supabaseClient.auth.signOut();
+      document.getElementById("username").value="";
+      document.getElementById("password").value="";
+      document.getElementById("loginError").innerText="";
+      showScreen("loginScreen");
+      if(subscription) subscription.unsubscribe();
+    }
+
+    function showDashboardScreen(){
+      showScreen("dashboardScreen");
+    }
+
+    function showClusterScreenFromDashboard(){
+      loadClusters();
+      showScreen("clusterScreen");
+    }
+
+    function showClusterScreen(){
+      showScreen("clusterScreen");
+    }
+
+    async function loadClusters(){
+  const clusters = Array.from({length: 12}, (_, i) => "C" + (i + 1));
+  const select=document.getElementById("clusterSelect"); 
+  select.innerHTML="<option value=''>Choose Cluster...</option>";
+  let allOpt = document.createElement("option");
+  allOpt.value = "ALL";
+  allOpt.textContent = "All clusters";
+  select.appendChild(allOpt);
+  clusters.forEach(c=>{
+    let o=document.createElement("option");
+    o.value=c; o.textContent=c;
+    select.appendChild(o);
+  });
+}
+
+    async function loadClusterData(){
+  currentCluster=document.getElementById("clusterSelect").value;
+  const session = supabaseClient.auth.getSession ? await supabaseClient.auth.getSession() : null;
+  let username = document.getElementById("username").value.trim();
+  if(session && session.data && session.data.session && session.data.session.user && session.data.session.user.email){
+    username = session.data.session.user.email.split('@')[0];
+  }
+  let allData = [];
+  let from = 0, batchSize = 1000, more = true;
+  while(more){
+    let query = supabaseClient
+      .from("family_members")
+      .select("*")
+      .eq("username", username)
+      .range(from, from + batchSize - 1);
+    if(currentCluster && currentCluster !== "ALL") {
+      query = query.eq("Cluster Number", currentCluster);
+    }
+    const { data, error } = await query;
+    if(error) return console.error(error);
+    allData = allData.concat(data);
+    more = data.length === batchSize;
+    from += batchSize;
+  }
+  familyData=allData; familiesMap={};
+  allData.forEach(m=>{
+    let cluster = m["Cluster Number"];
+    let hh = m["HH ID"];
+    if(!familiesMap[cluster]) familiesMap[cluster] = {};
+    if(!familiesMap[cluster][hh]) familiesMap[cluster][hh]=[];
+    familiesMap[cluster][hh].push(m);
+  });
+  if(currentCluster === "ALL") {
+    let totalFamilies = 0, totalMembers = 0;
+    Object.values(familiesMap).forEach(clusterObj => {
+      totalFamilies += Object.keys(clusterObj).length;
+      Object.values(clusterObj).forEach(members => totalMembers += members.length);
+    });
+    document.getElementById("totalFamilies").textContent = totalFamilies;
+    document.getElementById("totalMembers").textContent = totalMembers;
+    displayAllClustersFamilies(familiesMap);
+  } else {
+    document.getElementById("totalFamilies").textContent = Object.keys(familiesMap[currentCluster]||{}).length;
+    document.getElementById("totalMembers").textContent = (familyData||[]).length;
+    displayFamilies(familiesMap[currentCluster]||{});
+  }
+  document.getElementById("clusterDashboard").style.display="block";
+}
+
+function getFamilyHead(members) {
+  if (!members || !members.length) return null;
+
+  // Find oldest by Age
+  return members.reduce((oldest, m) => {
+    const age = parseInt(m["Age"]) || 0;
+    const oldestAge = parseInt(oldest["Age"]) || 0;
+    return age > oldestAge ? m : oldest;
+  }, members[0]);
+}
+
+    function displayAllClustersFamilies(allClusters){
+  const cont = document.getElementById("familiesContainer");
+  let html = "";
+
+  // Sort cluster keys like C1, C2, C3 ... by numeric part
+  const clusters = Object.keys(allClusters || {}).sort((a,b) => {
+    const na = parseInt((a||"").replace(/\D/g,'')) || 0;
+    const nb = parseInt((b||"").replace(/\D/g,'')) || 0;
+    return na - nb;
+  });
+
+  clusters.forEach(cluster => {
+    html += `<h3 style="margin-top:20px;color:#667eea;">Cluster ${cluster}</h3>`;
+
+    // get families object for cluster, and sort household keys numerically
+    const families = allClusters[cluster] || {};
+    const hhKeys = Object.keys(families).sort((x,y) => {
+      return (parseInt(x) || 0) - (parseInt(y) || 0);
+    });
+
+    hhKeys.forEach(hh => {
+      const members = families[hh];
+      // choose head (you may already have getFamilyHead)
+      const headMember = (typeof getFamilyHead === 'function') ? getFamilyHead(members) : (members[0] || {});
+      const headName = headMember ? (headMember["Citizen Name"] || "Unknown") : "Unknown";
+      const doorNo = (headMember && headMember["Door No."]) ? headMember["Door No."] : (members[0] && members[0]["Door No."]) || "";
+      html += `
+        <div class="family-card" onclick="showFamilyMembers('${hh}','${cluster}')">
+          <h4>Cluster: ${cluster} | Household ${hh}</h4>
+          <div class="family-members-count">${members.length} members</div>
+          <p><b>Head:</b> ${headName}</p>
+          <p><b>Door No:</b> ${doorNo}</p>
+        </div>
+      `;
+    });
+  });
+
+  cont.innerHTML = html || "<p>No families found.</p>";
+}
+
+    function displayFamilies(families){
+  const cont=document.getElementById("familiesContainer"); 
+  let html="";
+  Object.entries(families).forEach(([hh,members])=>{
+    const headMember = getFamilyHead(members);
+    const head = headMember ? headMember["Citizen Name"] : "Unknown";
+    const doorNo = headMember ? headMember["Door No."] : "";
+    html+=`
+      <div class="family-card" onclick="showFamilyMembers('${hh}')">
+        <h4>Household ${hh}</h4>
+        <div class="family-members-count">${members.length} members</div>
+        <p><b>Head:</b> ${head}</p>
+        <p><b>Door No:</b> ${doorNo}</p>
+      </div>`;
+  }); 
+  cont.innerHTML=html;
+}
+
+function filterFamilies(){
+  const term = document.getElementById("familySearch").value.toLowerCase();
+  if(!term){
+    if(currentCluster === "ALL") {
+      displayAllClustersFamilies(familiesMap);
+    } else {
+      displayFamilies(familiesMap[currentCluster] || {});
+    }
+    return;
+  }
+
+  function familyMatches(members) {
+    return members.some(m => {
+      const name = (m["Citizen Name"] || "").toString().toLowerCase();
+      const pensionId = (m["pension_id"] || "").toString().toLowerCase();
+      const riceCard = (m["rice_card"] || "").toString().toLowerCase();
+      const phone = (m["Ph No."] || "").toString().toLowerCase();
+      const hh = (m["HH ID"] || "").toString().toLowerCase();
+
+      return (
+        name.includes(term) ||
+        hh.includes(term) ||
+        pensionId.includes(term) ||
+        riceCard.includes(term) ||
+        phone.includes(term)
+      );
+    });
+  }
+
+  if(currentCluster === "ALL") {
+    const filteredAll = {};
+    Object.entries(familiesMap).forEach(([cluster, families]) => {
+      Object.entries(families).forEach(([hh, members]) => {
+        if(familyMatches(members)){
+          if(!filteredAll[cluster]) filteredAll[cluster] = {};
+          filteredAll[cluster][hh] = members;
+        }
+      });
+    });
+    displayAllClustersFamilies(filteredAll);
+  } else {
+    const filtered = {};
+    Object.entries(familiesMap[currentCluster] || {}).forEach(([hh, members]) => {
+      if(familyMatches(members)){
+        filtered[hh] = members;
+      }
+    });
+    displayFamilies(filtered);
+  }
+}
+
+
+    function showFamilyMembers(hhId, clusterNum){
+  let cluster = clusterNum || currentCluster;
+  currentFamily = familiesMap[cluster][hhId];
+  const head=currentFamily[0]["Citizen Name"]||"";
+  document.getElementById("familyTitle").innerText = `Cluster ${cluster} - ${hhId}`;
+  displayFamilyMembers(currentFamily, cluster, hhId);
+  showScreen("membersScreen");
+}
+
+    function displayFamilyMembers(family, clusterNum, hhId){
+  const container=document.getElementById("membersTable");
+  const doorDisplay=document.getElementById("doorNumberDisplay");
+  const mapContainer=document.getElementById("familyMapContainer");
+
+  if(!family || !family.length){
+    container.innerHTML="<p>No members found.</p>";
+    doorDisplay.innerHTML="";
+    mapContainer.innerHTML="";
+    return;
+  }
+
+  // ✅ Sort members by Famil ascending
+  const sortedFamily = [...family].sort((a,b) => {
+    return (parseInt(a["Famil"]) || 0) - (parseInt(b["Famil"]) || 0);
+  });
+
+  // Build table header
+  let html="<table><thead><tr>";
+  Object.keys(sortedFamily[0]).forEach(h=>{
+    if(!["HH ID","Cluster Number","id","SNO","username","created_at","updated_at","Door No.","lat","lng","geom"].includes(h)){
+      html+=`<th>${h}</th>`;
+    }
+  });
+  html+="<th>Actions</th></tr></thead><tbody>";
+
+  // Build table rows (using sorted family)
+  sortedFamily.forEach((m,i)=>{
+    html+="<tr>";
+    Object.keys(m).forEach(h=>{
+      if(!["HH ID","Cluster Number","id","SNO","username","created_at","updated_at","Door No.","lat","lng","geom"].includes(h)){
+        html+=`<td>${m[h]||""}</td>`;
+      }
+    });
+    html+=`<td><button class="btn btn-small" onclick="editMember(${i})">Edit</button></td></tr>`;
+  });
+
+  html+="</tbody></table>";
+  container.innerHTML=html;
+
+  // ✅ Add door number + location buttons (added Manual Location button)
+  let locationBtns = `
+  <div style="margin-top:10px;">
+    <button class="btn btn-small" onclick="captureFamilyLocationAll('${clusterNum}','${hhId}')">Capture Location📍</button>
+    <button class="btn btn-small" onclick="showFamilyMapAll('${clusterNum}','${hhId}')">Show in Maps🗺️</button>
+    <button class="btn btn-small" onclick="openManualFamilyMap('${clusterNum}','${hhId}')">Manual Location 📍✍️</button>
+
+  </div>
+`;
+  doorDisplay.innerHTML=`Door Number: ${sortedFamily[0]["Door No."]||""}${locationBtns}`;
+
+  // Auto-show map if available
+  showFamilyMapAll(clusterNum, hhId, true);
+
+  // ✅ Update global currentFamily to keep it in sorted order
+  currentFamily = sortedFamily;
+}
+
+async function captureFamilyLocationAll(clusterNum, hhId){
+  if (!navigator.geolocation) {
+    alert("Geolocation not supported");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(async function(pos){
+    const lat = Number(pos.coords.latitude.toFixed(15));
+    const lng = Number(pos.coords.longitude.toFixed(15));
+    const accuracy = pos.coords.accuracy;
+
+    const updateObj = {
+      lat,
+      lng,
+      geom: `SRID=4326;POINT(${lng} ${lat})`
+    };
+
+    // ✅ Update ALL rows of the same family
+    const { error } = await supabaseClient
+      .from("family_members")
+      .update(updateObj)
+      .eq("HH ID", hhId)
+      .eq("Cluster Number", clusterNum);
+
+    if(error){
+      alert("Error saving location: " + error.message);
+    } else {
+      alert(`✅ Location captured for all family members!\nAccuracy: ~${Math.round(accuracy)} meters`);
+      showFamilyMapAll(clusterNum, hhId);
+    }
+  }, err => {
+    alert("Error getting location: " + err.message);
+  }, {
+    enableHighAccuracy: true,
+    timeout: 30000,
+    maximumAge: 0
+  });
+}
+
+async function showFamilyMapAll(clusterNum, hhId, silent){
+  const { data, error } = await supabaseClient
+    .from("family_members")
+    .select("lat,lng,geom")
+    .eq("HH ID", hhId)
+    .eq("Cluster Number", clusterNum)
+    .limit(1);
+
+  if(error || !data || !data.length){
+    if(!silent) alert("Unable to load location.");
+    return;
+  }
+
+  let lat = data[0].lat !== null ? parseFloat(data[0].lat) : null;
+  let lng = data[0].lng !== null ? parseFloat(data[0].lng) : null;
+
+  // ✅ Proper regex for WKT
+  if((!lat || !lng) && data[0].geom && data[0].geom.startsWith("SRID=4326;POINT(")){
+  const coords = data[0].geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);  // ✅ FIXED
+  if(coords){
+    lng = parseFloat(coords[1]);
+    lat = parseFloat(coords[2]);
+  }
+}
+
+
+  const mapContainer = document.getElementById("familyMapContainer");
+  if (Number.isFinite(lat) && Number.isFinite(lng)){
+    const mapUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+    mapContainer.innerHTML = `
+      <div style="margin-top:15px;">
+        <iframe width="100%" height="300" frameborder="0" style="border:0" src="${mapUrl}" allowfullscreen></iframe>
+      </div>`;
+  } else {
+    mapContainer.innerHTML = "";
+    if(!silent) alert("No location captured yet.");
+  }
+}
+
+
+    function editMember(index){
+      const member=currentFamily[index];
+      const editable=["Ph No.","Caste","Sub caste","Door No."];
+      let html='<div class="detail-card"><h3>Edit Member Details</h3>';
+      Object.keys(member).forEach(f=>{
+        if(!["HH ID","Cluster Number","id","SNO","username","created_at","updated_at","lat","lng","geom"].includes(f)){
+          html+=`<div class="detail-row"><div class="detail-label">${f}</div><div class="detail-value">`;
+          if(editable.includes(f)) html+=`<input class="edit-input" id="edit-${f.replace(/\s+/g,'')}" value="${member[f]||''}" data-field="${f}">`;
+          else html+=member[f]||"";
+          html+=`</div></div>`;
+        }
+      });
+      html+=`<div class="edit-buttons">
+                <button class="btn" style="background:#ccc" onclick="displayFamilyMembers(currentFamily)">Cancel</button>
+                <button class="btn" onclick="saveMember(${index})">Save</button>
+             </div></div>`;
+      document.getElementById("membersTable").innerHTML=html;
+    }
+
+    async function saveMember(index){
+      const member=currentFamily[index]; const updates={};
+      document.querySelectorAll(".edit-input").forEach(i=>{ updates[i.dataset.field]=i.value; member[i.dataset.field]=i.value; });
+      const { error } = await supabaseClient.from("family_members").update(updates).eq("id", member.id);
+      if(error){ alert("Error: "+error.message); return; }
+      alert("Changes saved!"); displayFamilyMembers(currentFamily);
+    }
+
+// --- Manual Location Editor Implementation ---
+// Adds a modal Leaflet map with layer-switcher (OSM, Esri, Carto) and draggable marker.
+
+// ensure leaflet css/js loaded once
+let _leafletLoaded = false;
+async function ensureLeaflet(){
+  if(_leafletLoaded) return;
+  const css = document.createElement('link');
+  css.rel='stylesheet'; css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(css);
+  await new Promise(r=>css.onload=r);
+  const s = document.createElement('script');
+  s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  document.body.appendChild(s);
+  await new Promise(r=>s.onload=r);
+  _leafletLoaded = true;
+}
+
+async function openManualFamilyMap(clusterNum, hhId){
+  manualTarget = { hhId, clusterNum };
+  manualPensionTarget = { idx:null };
+
+  document.getElementById("manualMapModal").classList.add("active");
+  document.getElementById("manualMapCoords").innerText = "Loading location...";
+
+  // If map not created yet, initialize
+  if(!manualMap){
+    manualMap = L.map("manualMap").setView([16.5,80.6],12);
+    let osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19});
+    let esri = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19});
+    let carto = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",{maxZoom:19});
+    osm.addTo(manualMap);
+    L.control.layers({"OSM":osm,"Esri":esri,"Carto":carto}).addTo(manualMap);
+    manualMap.on("click", e=>placeManualMarker(e.latlng));
+  }
+
+  // Fetch existing location
+  const { data } = await supabaseClient
+    .from("family_members")
+    .select("lat,lng,geom")
+    .eq("HH ID", hhId)
+    .eq("Cluster Number", clusterNum)
+    .limit(1);
+
+  let lat=16.5, lng=80.6, hasLocation=false;
+  if(data && data.length){
+    if(data[0].lat && data[0].lng){
+      lat = parseFloat(data[0].lat);
+      lng = parseFloat(data[0].lng);
+      hasLocation = true;
+    } // inside openManualFamilyMap
+  else if(data[0].geom && data[0].geom.startsWith("SRID=4326;POINT(")){
+  const c = data[0].geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);  // ✅ FIXED
+  if(c){ lng = parseFloat(c[1]); lat = parseFloat(c[2]); hasLocation = true; }
+    }
+
+  }
+
+  if(!hasLocation){
+    alert("⚠️ No location captured yet. Please pick a location.");
+  }
+
+  setTimeout(() => {
+    manualMap.invalidateSize();
+    manualMap.setView([lat, lng], 16);
+    placeManualMarker({ lat, lng });
+  }, 300);
+}
+
+
+async function saveManualLocation(){
+  if(!manualMarker || !manualMarker._savedCoords) {
+    alert("⚠️ Please place a pin on the map before saving.");
+    return;
+  }
+  const latNum = Number(manualMarker._savedCoords.lat);
+  const lngNum = Number(manualMarker._savedCoords.lng);
+
+  const updateObj = {
+    lat: latNum,
+    lng: lngNum,
+    geom: `SRID=4326;POINT(${lngNum} ${latNum})`
+  };
+
+  if(manualTarget.hhId){  
+  // Save for all family members
+  const { error } = await supabaseClient
+    .from('family_members')
+    .update(updateObj)
+    .eq('HH ID', manualTarget.hhId)
+    .eq('Cluster Number', manualTarget.clusterNum);
+
+  if(error) { alert("❌ Error saving location: " + error.message); return; }
+
+  // 🔑 Update local currentFamily values so iframe uses new coords
+  currentFamily.forEach(m => {
+    m.lat = latNum;
+    m.lng = lngNum;
+    m.geom = updateObj.geom;
+  });
+
+  alert("✅ Manual location saved for household.");
+  showFamilyMapAll(manualTarget.clusterNum, manualTarget.hhId);
+} 
+else if(manualPensionTarget.idx !== null){
+  const p = filteredPensioners[manualPensionTarget.idx];
+  const { error } = await supabaseClient
+    .from('family_members')
+    .update(updateObj)
+    .eq('id', p.id);
+
+  if(error) { alert("❌ Error saving pensioner location: " + error.message); return; }
+
+  // 🔑 Update local pensioner object
+  p.lat = latNum;
+  p.lng = lngNum;
+  p.geom = updateObj.geom;
+
+  alert("✅ Manual location saved for pensioner.");
+  showPensionMap(manualPensionTarget.idx);
+}
+  
+
+  closeManualMap();
+}
+
+
+// --- Pensioners Section ---
+
+async function fetchPensioners() {
+  let { data, error } = await supabaseClient
+    .from("family_members")
+    .select("id,SNO,\"Citizen Name\",\"Aadhar Number\",\"Cluster Number\",\"Ph No.\",pension_id,scheme,amount,lat,lng,geom")
+    .not("pension_id", "is", null);
+  if (error) {
+    console.log("Supabase error:", error);
+    pensionersData = [];
+    filteredPensioners = [];
+    document.getElementById("pensionTilesContainer").innerHTML = "<p style='color:red'>Error loading pensioners.</p>";
+    document.getElementById("pensionTotal").innerText = "";
+    return;
+  }
+  pensionersData = data || [];
+  filteredPensioners = pensionersData;
+  displayPensionTiles();
+}
+
+
+function showPensionScreenFromDashboard() {
+  fetchPensioners();
+  showScreen("pensionScreen");
+}
+
+function showPensionScreen() {
+  fetchPensioners();
+  showScreen("pensionScreen");
+}
+
+function filterPensioners() {
+  const term = document.getElementById("pensionSearch").value.toLowerCase();
+  if (!term) {
+    filteredPensioners = pensionersData;
+  } else {
+    filteredPensioners = pensionersData.filter(p => {
+      return [
+        p["Citizen Name"],
+        p["Aadhar Number"],
+        p["Cluster Number"],
+        p["Ph No."],
+        p["pension_id"],
+        p["scheme"],
+        p["amount"]
+      ]
+      .map(v => (v ?? "").toString().toLowerCase())
+      .some(v => v.includes(term));
+    });
+  }
+  displayPensionTiles();
+}
+
+function displayPensionTiles() {
+  const container = document.getElementById("pensionTilesContainer");
+  if(!container) return;
+
+  // ✅ Sort by Cluster Number (numeric part)
+  filteredPensioners.sort((a,b) => {
+    const na = parseInt((a["Cluster Number"]||"").replace(/\D/g,'')) || 0;
+    const nb = parseInt((b["Cluster Number"]||"").replace(/\D/g,'')) || 0;
+    return na - nb;
+  });
+
+  const total = filteredPensioners.length;
+  document.getElementById("pensionTotal").innerText = `Total Pensioners: ${total}`;
+
+  if(total === 0){
+    container.innerHTML = "<p>No pensioners found.</p>";
+    return;
+  }
+
+  let html = '<div class="pension-tiles-grid">';
+  filteredPensioners.forEach((p, idx) => {
+    const serial = idx + 1; // display series number
+    const cluster = p["Cluster Number"] || "";
+    const name = p["Citizen Name"] || "";
+    const aadhar = p["Aadhar Number"] || "";
+    const ph = p["Ph No."] || "";
+    const pensionId = p.pension_id || "";
+    const scheme = p.scheme || "";
+    const amount = p.amount || "";
+
+    html += `
+      <div class="pension-tile" onclick="showPensionClusterScreen(${idx})" style="cursor:pointer;">
+        <div class="pension-tile-header">
+          <div style="font-size:14px">S. No : ${serial}</div>
+          <div style="font-size:13px">Cluster Name : ${cluster}</div>
+        </div>
+        <div class="pension-tile-body">
+          <div class="pension-tile-info">
+            <div><b>Pension ID :</b> ${pensionId}</div>
+            <div><b>Name :</b> ${name}</div>
+            <div><b>UID Number :</b> ${aadhar}</div>
+            <div><b>Mobile Number :</b> ${ph}</div>
+            <div style="margin-top:6px;">
+              <span><b>Scheme :</b> ${scheme}</span>
+              &nbsp;&nbsp;
+              <span><b>Amount :</b> ₹${amount || ""}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showPensionClusterScreen(idx) {
+  displayPensionClusterTable(idx);
+  showScreen("pensionClusterScreen");
+}
+
+
+function displayPensionClusterTable(idx) {
+  const container = document.getElementById("pensionClusterTable");
+  const mapContainer = document.getElementById("pensionDetailMapContainer");
+  const p = filteredPensioners[idx];
+  document.getElementById("pensionClusterTitle").innerText = `Pensioner Detail`;
+
+  // Table with Edit button for Ph No.
+  let html = "<table><thead><tr>";
+  html += "<th>SNO</th><th>Name</th><th>Aadhar</th><th>Cluster Number</th><th>Ph No.</th><th>Pension ID</th><th>Scheme</th><th>Amount</th><th>Actions</th></tr></thead><tbody>";
+  html += `<tr>
+    <td>${p.SNO||""}</td>
+    <td>${p["Citizen Name"]||""}</td>
+    <td>${p["Aadhar Number"]||""}</td>
+    <td>${p["Cluster Number"]||""}</td>
+    <td id="pension-phno-cell">${p["Ph No."]||""}</td>
+    <td>${p.pension_id||""}</td>
+    <td>${p.scheme||""}</td>
+    <td>₹${p.amount||""}</td>
+    <td>
+      <button class="btn btn-small" onclick="editPensionerPhNo(${idx})">Edit</button>
+    </td>
+  </tr>`;
+  html += "</tbody></table>";
+
+  // Location buttons below the table
+  html += `
+    <div style="margin-top:15px;">
+      <button class="btn btn-small" onclick="capturePensionLocation(${idx})">Capture Location📍</button>
+      <button class="btn btn-small" onclick="showPensionMap(${idx})">Show in Maps🗺️</button>
+      <button class="btn btn-small" onclick="openManualPensionMap(${idx})">Manual Location 📍✍️</button>
+    </div>
+  `;
+
+  container.innerHTML = html;
+  // Show map if available
+  showPensionMap(idx, true);
+}
+
+// Add edit/save/cancel logic for Ph No.
+function editPensionerPhNo(idx) {
+  const p = filteredPensioners[idx];
+  const cell = document.getElementById("pension-phno-cell");
+  cell.innerHTML = `<input id="edit-pension-phno" class="edit-input" value="${p["Ph No."]||""}" style="width:120px;">`;
+  // Replace Edit button with Save/Cancel
+  const btnCell = cell.parentElement.querySelector("td:last-child");
+  btnCell.innerHTML = `
+    <button class="btn btn-small" onclick="savePensionerPhNo(${idx})">Save</button>
+    <button class="btn btn-small" style="background:#ccc" onclick="displayPensionClusterTable(${idx})">Cancel</button>
+  `;
+}
+
+async function savePensionerPhNo(idx) {
+  const p = filteredPensioners[idx];
+  const newPhNo = document.getElementById("edit-pension-phno").value;
+  const { error } = await supabaseClient
+    .from("family_members")
+    .update({ "Ph No.": newPhNo })
+    .eq("id", p.id);
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+  p["Ph No."] = newPhNo;
+  alert("Phone number updated!");
+  displayPensionClusterTable(idx);
+}
+
+
+async function capturePensionLocation(idx) {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(async function(pos) {
+      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+      if (sessionError || !sessionData.session) {
+        alert("⚠️ Session expired, please login again.");
+        logout();
+        return;
+      }
+
+      const lat = pos.coords.latitude.toFixed(15);
+      const lng = pos.coords.longitude.toFixed(15);
+      const accuracy = pos.coords.accuracy;
+
+      const pensioner = filteredPensioners[idx];
+      const updateObj = { lat, lng, geom: `SRID=4326;POINT(${lng} ${lat})` };
+
+      const { error } = await supabaseClient
+        .from("family_members")
+        .update(updateObj)
+        .eq("id", pensioner.id);
+
+      if (error) {
+        alert("Supabase update error: " + error.message);
+        return;
+      }
+
+      pensioner.lat = lat;
+      pensioner.lng = lng;
+      pensioner.geom = updateObj.geom;
+
+      alert(`✅ Pensioner location captured!\nAccuracy: ~${Math.round(accuracy)} meters`);
+      showPensionMap(idx);
+    }, function (err) {
+      if (err.code === 1) {
+        alert('Permission denied for location. Please check your browser settings.');
+      } else {
+        alert('Error getting location: ' + err.message);
+      }
+    }, {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    });
+  } else {
+    alert("Geolocation not supported");
+  }
+}
+
+function showPensionMap(idx, silent) {
+  const pensioner = filteredPensioners[idx];
+  let lat = pensioner.lat, lng = pensioner.lng;
+  if(pensioner.geom && typeof pensioner.geom === "string" && pensioner.geom.startsWith("SRID=4326;POINT(")){
+    const coords = pensioner.geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/); // ✅ FIXED
+    if(coords){ lng = parseFloat(coords[1]); lat = parseFloat(coords[2]); }
+  }
+  const mapContainer = document.getElementById("pensionDetailMapContainer");
+  if (Number.isFinite(lat) && Number.isFinite(lng)){
+    const mapUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+    mapContainer.innerHTML = `<div style="margin-top:15px;"><iframe width="100%" height="300" frameborder="0" style="border:0" src="${mapUrl}" allowfullscreen></iframe></div>`;
+  } else {
+    mapContainer.innerHTML = "";
+    if(!silent) alert("No location captured yet.");
+  }
+}
+
+
+
+let manualMap = null;
+let manualMarker = null;
+let manualTarget = { hhId:null, clusterNum:null };
+
+function closeManualMap(){
+  if (manualMap) {
+    manualMap.remove();   // destroy old map
+    manualMap = null;
+    manualMarker = null;
+  }
+  document.getElementById("manualMapModal").classList.remove("active");
+}
+
+function placeManualMarker(latlng){
+  if(manualMarker){
+    manualMarker.setLatLng(latlng);
+  } else {
+    manualMarker = L.marker(latlng, {draggable:true}).addTo(manualMap);
+   manualMarker.on("dragend", e => {
+  manualMarker._savedCoords = e.target.getLatLng();
+  document.getElementById("manualMapCoords").innerText =
+    `Lat: ${manualMarker._savedCoords.lat.toFixed(6)}, Lng: ${manualMarker._savedCoords.lng.toFixed(6)}`;
+});
+
+  }
+  manualMarker._savedCoords = latlng;
+  document.getElementById("manualMapCoords").innerText = `Lat: ${latlng.lat.toFixed(6)}, Lng: ${latlng.lng.toFixed(6)}`;
+}
+
+
+async function openManualPensionMap(idx){
+  manualTarget = { hhId:null, clusterNum:null };
+  manualPensionTarget = { idx };
+
+  document.getElementById("manualMapModal").classList.add("active");
+  document.getElementById("manualMapCoords").innerText = "Loading location...";
+
+  if(!manualMap){
+    manualMap = L.map("manualMap").setView([16.5,80.6],12);
+    let osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19});
+    let esri = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19});
+    let carto = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",{maxZoom:19});
+    osm.addTo(manualMap);
+    L.control.layers({"OSM":osm,"Esri":esri,"Carto":carto}).addTo(manualMap);
+    manualMap.on("click", e=>placeManualMarker(e.latlng));
+  }
+
+  const p = filteredPensioners[idx];
+  let lat = 16.5, lng = 80.6;
+  if(p.lat && p.lng){ lat = parseFloat(p.lat); lng = parseFloat(p.lng); }
+  else if(p.geom && p.geom.startsWith("SRID=4326;POINT(")){
+    const c = p.geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);
+    if(c){ lng=parseFloat(c[1]); lat=parseFloat(c[2]); }
+  }
+
+  setTimeout(() => {
+    manualMap.invalidateSize();
+    manualMap.setView([lat,lng],16);
+    placeManualMarker({ lat, lng });
+  }, 300);
+}
+
+    // Persistent login
+    window.addEventListener("DOMContentLoaded", async ()=>{
+      const { data } = await supabaseClient.auth.getSession();
+      if(data.session){
+        currentUser = data.session.user;
+        showScreen("dashboardScreen");
+        subscribeRealtime();
+      }
+    });
+
+    // Supabase subscription for realtime updates
+    function subscribeRealtime(){
+      if(subscription) subscription.unsubscribe();
+      subscription = supabaseClient
+        .channel('family_members_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'family_members' }, payload => {
+          // Reload cluster data if on cluster or members screen
+          if(document.getElementById("clusterScreen").classList.contains("active") || document.getElementById("membersScreen").classList.contains("active")){
+            loadClusterData();
+          }
+          // Reload pensioners if on pensioner screens
+          if(document.getElementById("pensionScreen").classList.contains("active") || document.getElementById("pensionClusterScreen").classList.contains("active")){
+            fetchPensioners();
+          }
+        })
+        .subscribe();
+    }
+  </script>
+  <div id="manualMapModal" class="manual-modal">
+  <div class="manual-modal-content">
+    <div style="padding:8px;display:flex;justify-content:space-between;align-items:center;background:#f7f7f7;">
+      <strong>Adjust Location</strong>
+      <div>
+        <button id="manualSaveBtn" class="btn btn-small" onclick="saveManualLocation()">Save</button>
+        <button class="btn btn-small" style="background:#ccc" onclick="closeManualMap()">Cancel</button>
+      </div>
+    </div>
+    <div id="manualMap" style="width:100%;height:400px"></div>
+    <div id="manualMapCoords" style="padding:8px;font-size:12px;color:#444;"></div>
+  </div>
+</div>
+<script>
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      document.getElementById("splashScreen").style.display = "none";
+      document.getElementById("app").style.display = "block";
+    }, 4000); // splash lasts 4s with animations
+  });
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,5 @@
+[build]
+
+  publish = "."
+  command = "cp env.template.js env.js && sed -i 's|%%SUPABASE_URL%%|'$SUPABASE_URL'|g; s|%%SUPABASE_ANON_KEY%%|'$SUPABASE_ANON_KEY'|g' env.js"
+
