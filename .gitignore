@@ -1,0 +1,12 @@
+# Local environment files
+.env
+env.js
+
+# Build / cache
+node_modules/
+dist/
+build/
+
+# OS junk
+.DS_Store
+Thumbs.db
