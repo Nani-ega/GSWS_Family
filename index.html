@@ -16,6 +16,7 @@
    <link rel="stylesheet" href="assets/leaflet.css" />
   <script src="assets/leaflet.js"></script>
 
+
   <style>*{margin:0;padding:0;box-sizing:border-box}
 
 body {
@@ -146,13 +147,27 @@ display: flex; flex-direction: column; gap: 18px; margin-top: 8px; } .pension-ti
 }
 .manual-modal.active { display:flex; }
 
-
+.small-tile {
+  width:150px;
+  height:80px;
+}
 @media(max-width:768px){
   .container{padding:12px;border-radius:10px}
   .manual-modal{width:96%;height:92vh;}
   .manual-modal #manual-map{height:calc(92vh - 60px)!important}
   table,th,td{font-size:13px}
 } h2{font-size:1.1em}  </style>
+
+<style>
+#clusterwiseReport table,
+#clusterwiseReport th,
+#clusterwiseReport td,
+#castewiseReport table,
+#castewiseReport th,
+#castewiseReport td {
+  text-align: center;
+}
+</style>
 
 </head>
 <body>
@@ -170,27 +185,46 @@ display: flex; flex-direction: column; gap: 18px; margin-top: 8px; } .pension-ti
     <button class="btn" onclick="login()">Login</button>
     <div id="loginError" style="color:red;margin-top:10px;"></div>
   </div>
-</div>  <!-- Dashboard -->  <div id="dashboardScreen" class="screen">
-    <div class="container">
-      <h1>Welcome</h1>
-      <div style="display:flex;justify-content:center;gap:30px;margin-top:40px;">
-        <div class="stat-card" onclick="showClusterScreenFromDashboard()">
-          <div class="stat-number"><span>&#128101;</span></div>
-          <div class="stat-label">Family Members</div>
-        </div>
-        <div class="stat-card" onclick="showPensionScreenFromDashboard()">
-            <div class="stat-number"><span>&#128179;</span></div>
-            <div class="stat-label">Pensioners</div>
-        </div>
+</div>  
+
+  <!-- Dashboard -->  
+  
+<div id="dashboardScreen" class="screen">
+  <div class="container">
+    <h1>Welcome</h1>
+    <div class="dashboard-stats" style="justify-content:center; grid-template-columns:repeat(2,150px); gap:30px;">
+      <div class="stat-card" onclick="showClusterScreenFromDashboard()">
+        <div class="stat-number"><span>&#128101;</span></div>
+        <div class="stat-label">Family Members</div>
       </div>
-      <button class="btn" style="margin-top:40px;" onclick="logout()">Logout</button>
+      <div class="stat-card" onclick="showPensionScreenFromDashboard()">
+        <div class="stat-number"><span>&#128179;</span></div>
+        <div class="stat-label">Pensioners</div>
+      </div>
     </div>
-  </div>  <!-- Cluster -->  <div id="clusterScreen" class="screen">
+    <div style="display:flex;justify-content:center;margin-top:25px;">
+      <div class="stat-card" onclick="showReportsScreen()" style="width:150px;">
+        <div class="stat-number"><span>&#128202;</span></div>
+        <div class="stat-label">Reports</div>
+      </div>
+    </div>
+    <button class="btn" style="margin-top:40px;" onclick="logout()">Logout</button>
+    <div style="margin-top:10px;display:flex;justify-content:space-between;">
+      <button class="btn btn-small" onclick="manualRefresh()">🔄 Refresh</button>
+      <button class="btn btn-small" onclick="clearAppCache()">🗑️ Clear Cache</button>
+    </div>
+  </div>
+</div>
+ <!-- Cluster -->  
+  <div id="clusterScreen" class="screen">
     <div class="container wide-container">
       <div class="nav-header">
-        <button class="back-btn" onclick="showDashboardScreen()">&larr;</button>
-        <h2>Select Cluster</h2>
-        <button class="btn btn-small" onclick="logout()">Logout</button>
+  <button class="back-btn" onclick="showDashboardScreen()">&larr;</button>
+  <h2>Select Cluster</h2>
+  <div style="display:flex;gap:5px;">
+    <button class="btn btn-small" onclick="manualRefresh()">🔄</button>
+    <button class="btn btn-small" onclick="logout()">Logout</button>
+  </div>
       </div>
       <select id="clusterSelect" onchange="loadClusterData()">
         <option value="">Choose Cluster...</option>
@@ -207,10 +241,13 @@ display: flex; flex-direction: column; gap: 18px; margin-top: 8px; } .pension-ti
   </div>  <!-- Family Members -->  <div id="membersScreen" class="screen">
     <div class="container full-container">
       <div class="nav-header">
-        <button class="back-btn" onclick="showClusterScreen()">&larr;</button>
-        <h2 id="familyTitle">Family Members</h2>
-        <button class="btn btn-small" onclick="logout()">Logout</button>
-      </div>
+  <button class="back-btn" onclick="showClusterScreen()">&larr;</button>
+  <h2 id="familyTitle">Family Members</h2>
+  <div style="display:flex;gap:5px;">
+    <button class="btn btn-small" onclick="manualRefresh()">🔄</button>
+    <button class="btn btn-small" onclick="logout()">Logout</button>
+  </div>
+</div> 
       <div class="table-container">
         <div id="membersTable"></div>
       </div>
@@ -222,7 +259,10 @@ display: flex; flex-direction: column; gap: 18px; margin-top: 8px; } .pension-ti
     <div class="nav-header">
       <button class="back-btn" onclick="showDashboardScreen()">&larr;</button>
       <h2>Pensioners</h2>
+      <div style="display:flex;gap:5px;">
+      <button class="btn btn-small" onclick="manualRefresh()">🔄</button>
       <button class="btn btn-small" onclick="logout()">Logout</button>
+    </div>
     </div>
     <input type="text" id="pensionSearch" placeholder="Search pensioners..." oninput="filterPensioners()" style="margin-bottom:15px;">
     <div id="pensionTotal" style="margin-bottom:10px;font-weight:bold;color:#667eea;"></div>
@@ -233,21 +273,129 @@ display: flex; flex-direction: column; gap: 18px; margin-top: 8px; } .pension-ti
     <div class="nav-header">
       <button class="back-btn" onclick="showPensionScreen()">&larr;</button>
       <h2 id="pensionClusterTitle">Pensioners - Detail</h2>
+      <div style="display:flex;gap:5px;">
+      <button class="btn btn-small" onclick="manualRefresh()">🔄</button>
       <button class="btn btn-small" onclick="logout()">Logout</button>
+    </div>
     </div>
     <div class="table-container">
       <div id="pensionClusterTable"></div>
     </div>
     <div id="pensionDetailMapContainer"></div>
   </div>
-</div>  <script>
+</div>
+
+<!-- Reports Screen -->
+<div id="reportsScreen" class="screen">
+  <div class="container wide-container">
+
+    <div id="reportsMenu">
+      <div class="nav-header">
+        <button class="back-btn" onclick="showDashboardScreen()">&larr;</button>
+        <h2>Reports</h2>
+        <div style="display:flex;gap:5px;">
+          <button class="btn btn-small" onclick="logout()">Logout</button>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:30px;margin-top:40px;">
+        <div class="stat-card" onclick="showClusterwiseReport()">
+          <div class="stat-number">🕸️</div>
+          <div class="stat-label">Clusterwise</div>
+        </div>
+        <div class="stat-card" onclick="showCastewiseReport()">
+          <div class="stat-number">💼</div>
+          <div class="stat-label">Castewise</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="clusterwiseReport" style="display:none;margin-top:30px;">
+      <div class="nav-header">
+        <button class="back-btn" onclick="showReportsScreen()">&larr;</button>
+        <h2>Clusterwise Report</h2>
+        <div style="display:flex;gap:5px;">
+          <button class="btn btn-small" onclick="manualRefresh()">🔄</button>
+          <button class="btn btn-small" onclick="logout()">Logout</button>
+        </div>
+      </div>
+      <div class="table-container" id="clusterwiseTable"></div>
+    </div>
+
+    <div id="castewiseReport" style="display:none;margin-top:30px;">
+      <div class="nav-header">
+        <button class="back-btn" onclick="showReportsScreen()">&larr;</button>
+        <h2>Castewise Report</h2>
+        <div style="display:flex;gap:5px;">
+          <button class="btn btn-small" onclick="manualRefresh()">🔄</button>
+          <button class="btn btn-small" onclick="logout()">Logout</button>
+        </div>
+      </div>
+      <div class="table-container" id="castewiseTable"></div>
+    </div>
+
+  </div>
+</div>
+<script>
+    
+    // Clear any residual data on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      // Reset all displays to default
+      document.getElementById("totalFamilies").textContent = "0";
+      document.getElementById("totalMembers").textContent = "0";
+      document.getElementById("clusterDashboard").style.display = "none";
+    });
+    
     if ("serviceWorker" in navigator) {
-      window.addEventListener('load', () => {
-      navigator.serviceWorker.register("/sw.js")
-        .then(() => console.log("✅ Service Worker registered"))
-        .catch(err => console.error("❌ SW registration failed:", err));
-      });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register("/sw.js")
+      .then(registration => {
+        console.log("✅ Service Worker registered");
+        
+        // Check for updates every 30 seconds
+        setInterval(() => {
+          registration.update();
+        }, 30000);
+        
+        // Handle SW updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'activated') {
+              // Clear cache and reload for fresh data
+              if (navigator.serviceWorker.controller) {
+                console.log('New SW activated, will reload');
+                setTimeout(() => {
+                  window.location.reload(true);
+                }, 1000);
+              }
+            }
+          });
+        });
+        
+        // Add cache clear button handler
+        window.clearAppCache = () => {
+  if (!navigator.serviceWorker.controller) {
+    alert('Service Worker not active yet. Please refresh and try again.');
+    return;
+  }
+  const channel = new MessageChannel();
+  navigator.serviceWorker.controller.postMessage(
+    { type: 'CLEAR_CACHE' },
+    [channel.port2]
+  );
+  channel.port1.onmessage = (event) => {
+    if (event.data.success) {
+      alert('Cache cleared! Refreshing...');
+      window.location.reload(true);
+
     }
+  };
+};
+      })
+      .catch(err => console.error("❌ SW registration failed:", err));
+  });
+
+}
     const SUPABASE_URL = window.env.SUPABASE_URL;
     const SUPABASE_KEY = window.env.SUPABASE_ANON_KEY; 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -257,35 +405,102 @@ display: flex; flex-direction: column; gap: 18px; margin-top: 8px; } .pension-ti
     // Pensioners data
     let pensionersData = [], filteredPensioners = [];
 
+    // User cluster limit variable
+    let userClusterLimit = 12; // Default value
+
     function showScreen(id){
       document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     }
 
-    async function login(){
-      let username=document.getElementById("username").value.trim();
-      let password=document.getElementById("password").value.trim();
-      let email = username + "@gsws.com";
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-      if(error){
-        document.getElementById("loginError").innerText="Invalid login";
-        return;
-      }
-      currentUser = data.user;
-      showScreen("dashboardScreen");
-      subscribeRealtime();
+    // Fetch user's cluster limit from database
+    async function fetchUserClusterLimit(username) {
+      const { data, error } = await supabaseClient
+        .from("family_members")
+        .select("cluster_limit")  // lowercase as confirmed
+        .eq("username", username)
+        .limit(1)
+        .single();
+        
+      if (error || !data) return 12;   // fallback if missing
+      return parseInt(data.cluster_limit || 12);
     }
+
+    async function login() {
+     familyData = [];
+     familiesMap = {};
+     currentCluster = null;
+     currentFamily = null;
+     pensionersData = [];
+     filteredPensioners = [];
+  let username = document.getElementById("username").value.trim();
+  let password = document.getElementById("password").value.trim();
+  let email = username + "@gsws.com";
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+  if (error) {
+    document.getElementById("loginError").innerText = "Invalid login";
+    return;
+  }
+  currentUser = data.user;
+  
+  // Fetch user's cluster limit
+  userClusterLimit = await fetchUserClusterLimit(username);
+  
+  showScreen("dashboardScreen");
+  subscribeRealtime();
+  
+  // Load clusters immediately after login
+  loadClusters();
+}
 
     function logout(){
       supabaseClient.auth.signOut();
       document.getElementById("username").value="";
       document.getElementById("password").value="";
       document.getElementById("loginError").innerText="";
-      showScreen("loginScreen");
-      if(subscription) subscription.unsubscribe();
+  // ✅ CLEAR ALL CACHED DATA
+      familyData = [];
+      familiesMap = {};
+      currentCluster = null;
+      currentFamily = null;
+      pensionersData = [];
+      filteredPensioners = [];
+      userClusterLimit = 12; // Reset to default
+  
+document.getElementById("clusterSelect").innerHTML = "<option value=''>Choose Cluster...</option>";
+  document.getElementById("familiesContainer").innerHTML = "";
+  document.getElementById("totalFamilies").textContent = "0";
+  document.getElementById("totalMembers").textContent = "0";
+  document.getElementById("clusterDashboard").style.display = "none";
+  document.getElementById("familySearch").value = "";
+  
+  // Clear members screen
+  document.getElementById("membersTable").innerHTML = "";
+  document.getElementById("doorNumberDisplay").innerHTML = "";
+  document.getElementById("familyMapContainer").innerHTML = "";
+  document.getElementById("familyTitle").innerText = "Family Members";
+  
+  // Clear pension screen
+  document.getElementById("pensionTilesContainer").innerHTML = "";
+  document.getElementById("pensionTotal").innerText = "";
+  document.getElementById("pensionSearch").value = "";
+  
+  // Clear pension detail screen
+  document.getElementById("pensionClusterTable").innerHTML = "";
+  document.getElementById("pensionDetailMapContainer").innerHTML = "";
+  
+  
+  // Unsubscribe from realtime
+  if(subscription) subscription.unsubscribe();
+  subscription = null;
+  
+  // Show login screen
+  showScreen("loginScreen");
+
+    
     }
 
     function showDashboardScreen(){
@@ -293,7 +508,7 @@ display: flex; flex-direction: column; gap: 18px; margin-top: 8px; } .pension-ti
     }
 
     function showClusterScreenFromDashboard(){
-      loadClusters();
+      
       showScreen("clusterScreen");
     }
 
@@ -301,17 +516,21 @@ display: flex; flex-direction: column; gap: 18px; margin-top: 8px; } .pension-ti
       showScreen("clusterScreen");
     }
 
-    async function loadClusters(){
-  const clusters = Array.from({length: 12}, (_, i) => "C" + (i + 1));
-  const select=document.getElementById("clusterSelect"); 
-  select.innerHTML="<option value=''>Choose Cluster...</option>";
+   async function loadClusters() {
+  const clusters = Array.from({ length: userClusterLimit }, (_, i) => `C${i + 1}`);
+  const select = document.getElementById("clusterSelect");
+  select.innerHTML = "<option value=''>Choose Cluster...</option>";
+  
+  // Add "All clusters" option
   let allOpt = document.createElement("option");
   allOpt.value = "ALL";
   allOpt.textContent = "All clusters";
   select.appendChild(allOpt);
-  clusters.forEach(c=>{
-    let o=document.createElement("option");
-    o.value=c; o.textContent=c;
+  
+  clusters.forEach(c => {
+    let o = document.createElement("option");
+    o.value = c;
+    o.textContent = c;
     select.appendChild(o);
   });
 }
@@ -515,7 +734,7 @@ function filterFamilies(){
   // Build table header
   let html="<table><thead><tr>";
   Object.keys(sortedFamily[0]).forEach(h=>{
-    if(!["HH ID","Cluster Number","id","SNO","username","created_at","updated_at","Door No.","lat","lng","geom"].includes(h)){
+    if(!["HH ID","Cluster Number","id","SNO","username","created_at","updated_at","Door No.","lat","lng","geom","cluster_limit"].includes(h)){
       html+=`<th>${h}</th>`;
     }
   });
@@ -525,7 +744,7 @@ function filterFamilies(){
   sortedFamily.forEach((m,i)=>{
     html+="<tr>";
     Object.keys(m).forEach(h=>{
-      if(!["HH ID","Cluster Number","id","SNO","username","created_at","updated_at","Door No.","lat","lng","geom"].includes(h)){
+      if(!["HH ID","Cluster Number","id","SNO","username","created_at","updated_at","Door No.","lat","lng","geom","cluster_limit"].includes(h)){
         html+=`<td>${m[h]||""}</td>`;
       }
     });
@@ -553,13 +772,13 @@ function filterFamilies(){
   currentFamily = sortedFamily;
 }
 
-async function captureFamilyLocationAll(clusterNum, hhId){
+async function captureFamilyLocationAll(clusterNum, hhId) {
   if (!navigator.geolocation) {
     alert("Geolocation not supported");
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(async function(pos){
+  navigator.geolocation.getCurrentPosition(async function(pos) {
     const lat = Number(pos.coords.latitude.toFixed(15));
     const lng = Number(pos.coords.longitude.toFixed(15));
     const accuracy = pos.coords.accuracy;
@@ -570,19 +789,23 @@ async function captureFamilyLocationAll(clusterNum, hhId){
       geom: `SRID=4326;POINT(${lng} ${lat})`
     };
 
-    // ✅ Update ALL rows of the same family
     const { error } = await supabaseClient
       .from("family_members")
       .update(updateObj)
       .eq("HH ID", hhId)
       .eq("Cluster Number", clusterNum);
 
-    if(error){
+    if(error) {
       alert("Error saving location: " + error.message);
-    } else {
-      alert(`✅ Location captured for all family members!\nAccuracy: ~${Math.round(accuracy)} meters`);
-      showFamilyMapAll(clusterNum, hhId);
+      return;
     }
+    
+    alert(`✅ Location captured!\nAccuracy: ~${Math.round(accuracy)}m\nRefreshing...`);
+    
+    // Force complete data reload
+    await loadClusterData();
+    showFamilyMembers(hhId, clusterNum);
+    
   }, err => {
     alert("Error getting location: " + err.message);
   }, {
@@ -610,7 +833,7 @@ async function showFamilyMapAll(clusterNum, hhId, silent){
 
   // ✅ Proper regex for WKT
   if((!lat || !lng) && data[0].geom && data[0].geom.startsWith("SRID=4326;POINT(")){
-  const coords = data[0].geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);  // ✅ FIXED
+  const coords = data[0].geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);  
   if(coords){
     lng = parseFloat(coords[1]);
     lat = parseFloat(coords[2]);
@@ -637,7 +860,7 @@ async function showFamilyMapAll(clusterNum, hhId, silent){
       const editable=["Ph No.","Caste","Sub caste","Door No."];
       let html='<div class="detail-card"><h3>Edit Member Details</h3>';
       Object.keys(member).forEach(f=>{
-        if(!["HH ID","Cluster Number","id","SNO","username","created_at","updated_at","lat","lng","geom"].includes(f)){
+        if(!["HH ID","Cluster Number","id","SNO","username","created_at","updated_at","lat","lng","geom","cluster_limit"].includes(f)){
           html+=`<div class="detail-row"><div class="detail-label">${f}</div><div class="detail-value">`;
           if(editable.includes(f)) html+=`<input class="edit-input" id="edit-${f.replace(/\s+/g,'')}" value="${member[f]||''}" data-field="${f}">`;
           else html+=member[f]||"";
@@ -651,13 +874,29 @@ async function showFamilyMapAll(clusterNum, hhId, silent){
       document.getElementById("membersTable").innerHTML=html;
     }
 
-    async function saveMember(index){
-      const member=currentFamily[index]; const updates={};
-      document.querySelectorAll(".edit-input").forEach(i=>{ updates[i.dataset.field]=i.value; member[i.dataset.field]=i.value; });
-      const { error } = await supabaseClient.from("family_members").update(updates).eq("id", member.id);
-      if(error){ alert("Error: "+error.message); return; }
-      alert("Changes saved!"); displayFamilyMembers(currentFamily);
-    }
+    async function saveMember(index) {
+  const member = currentFamily[index];
+  const updates = {};
+  document.querySelectorAll(".edit-input").forEach(i => { 
+    updates[i.dataset.field] = i.value;
+  });
+  
+  const { error } = await supabaseClient
+    .from("family_members")
+    .update(updates)
+    .eq("id", member.id);
+  
+  if(error) { 
+    alert("Error: " + error.message); 
+    return; 
+  }
+  
+  alert("Changes saved! Refreshing...");
+  
+  // Force complete data reload
+  await loadClusterData();
+  showFamilyMembers(member["HH ID"], member["Cluster Number"]);
+}
 
 // --- Manual Location Editor Implementation ---
 // Adds a modal Leaflet map with layer-switcher (OSM, Esri, Carto) and draggable marker.
@@ -711,7 +950,7 @@ async function openManualFamilyMap(clusterNum, hhId){
       hasLocation = true;
     } // inside openManualFamilyMap
   else if(data[0].geom && data[0].geom.startsWith("SRID=4326;POINT(")){
-  const c = data[0].geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);  // ✅ FIXED
+  const c = data[0].geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);  
   if(c){ lng = parseFloat(c[1]); lat = parseFloat(c[2]); hasLocation = true; }
     }
 
@@ -729,11 +968,12 @@ async function openManualFamilyMap(clusterNum, hhId){
 }
 
 
-async function saveManualLocation(){
+async function saveManualLocation() {
   if(!manualMarker || !manualMarker._savedCoords) {
     alert("⚠️ Please place a pin on the map before saving.");
     return;
   }
+  
   const latNum = Number(manualMarker._savedCoords.lat);
   const lngNum = Number(manualMarker._savedCoords.lng);
 
@@ -743,46 +983,48 @@ async function saveManualLocation(){
     geom: `SRID=4326;POINT(${lngNum} ${latNum})`
   };
 
-  if(manualTarget.hhId){  
-  // Save for all family members
-  const { error } = await supabaseClient
-    .from('family_members')
-    .update(updateObj)
-    .eq('HH ID', manualTarget.hhId)
-    .eq('Cluster Number', manualTarget.clusterNum);
+  if(manualTarget.hhId) {  
+    const { error } = await supabaseClient
+      .from('family_members')
+      .update(updateObj)
+      .eq('HH ID', manualTarget.hhId)
+      .eq('Cluster Number', manualTarget.clusterNum);
 
-  if(error) { alert("❌ Error saving location: " + error.message); return; }
+    if(error) { 
+      alert("❌ Error: " + error.message); 
+      return; 
+    }
 
-  // 🔑 Update local currentFamily values so iframe uses new coords
-  currentFamily.forEach(m => {
-    m.lat = latNum;
-    m.lng = lngNum;
-    m.geom = updateObj.geom;
-  });
+    alert("✅ Location saved! Refreshing...");
+    closeManualMap();
+    
+    // Force complete data reload
+    await loadClusterData();
+    showFamilyMembers(manualTarget.hhId, manualTarget.clusterNum);
+  } 
+  else if(manualPensionTarget.idx !== null) {
+    const p = filteredPensioners[manualPensionTarget.idx];
+    const { error } = await supabaseClient
+      .from('family_members')
+      .update(updateObj)
+      .eq('id', p.id);
 
-  alert("✅ Manual location saved for household.");
-  showFamilyMapAll(manualTarget.clusterNum, manualTarget.hhId);
-} 
-else if(manualPensionTarget.idx !== null){
-  const p = filteredPensioners[manualPensionTarget.idx];
-  const { error } = await supabaseClient
-    .from('family_members')
-    .update(updateObj)
-    .eq('id', p.id);
+    if(error) { 
+      alert("❌ Error: " + error.message); 
+      return; 
+    }
 
-  if(error) { alert("❌ Error saving pensioner location: " + error.message); return; }
-
-  // 🔑 Update local pensioner object
-  p.lat = latNum;
-  p.lng = lngNum;
-  p.geom = updateObj.geom;
-
-  alert("✅ Manual location saved for pensioner.");
-  showPensionMap(manualPensionTarget.idx);
-}
-  
-
-  closeManualMap();
+    alert("✅ Location saved! Refreshing...");
+    closeManualMap();
+    
+    // Force pensioner data reload
+    await fetchPensioners();
+    // Find the pensioner in the new list
+    const newIdx = filteredPensioners.findIndex(pen => pen.id === p.id);
+    if(newIdx !== -1) {
+      showPensionMap(newIdx);
+    }
+  }
 }
 
 
@@ -837,6 +1079,126 @@ function filterPensioners() {
     });
   }
   displayPensionTiles();
+}
+
+function showReportsScreen() {
+  showScreen("reportsScreen");
+  showReportsMenu();
+}
+
+function showReportsMenu() {
+  document.getElementById("reportsMenu").style.display = "block";
+  document.getElementById("clusterwiseReport").style.display = "none";
+  document.getElementById("castewiseReport").style.display = "none";
+}
+
+async function showClusterwiseReport() {
+  document.getElementById("reportsMenu").style.display = "none";
+  document.getElementById("castewiseReport").style.display = "none";
+  document.getElementById("clusterwiseReport").style.display = "block";
+
+  const username = currentUser.email.split("@")[0];
+  const { data, error } = await supabaseClient
+    .from("family_members")
+    .select('"Cluster Number","HH ID"')
+    .eq("username", username)
+    .range(0, 9999);
+    
+
+  if (error) { console.error(error); return; }
+
+  const clusters = Array.from({ length: userClusterLimit }, (_, i) => `C${i + 1}`);
+  const clusterStats = {};
+  const seenFamilies = new Set();
+
+  clusters.forEach(c => clusterStats[c] = { families: 0, members: 0 });
+
+  data.forEach(row => {
+    const c = row["Cluster Number"];
+    if (!clusterStats[c]) return;
+    clusterStats[c].members++;
+    const key = `${c}_${row["HH ID"]}`;
+    if (!seenFamilies.has(key)) {
+      seenFamilies.add(key);
+      clusterStats[c].families++;
+    }
+  });
+
+  let totalF = 0, totalM = 0, sno = 1;
+  let html = `<table><thead><tr><th>S.No</th><th>Cluster Number</th><th>No. of Families</th><th>No. of Members</th></tr></thead><tbody>`;
+  clusters.forEach(c => {
+    const s = clusterStats[c];
+    totalF += s.families;
+    totalM += s.members;
+    html += `<tr><td>${sno++}</td><td>${c}</td><td>${s.families}</td><td>${s.members}</td></tr>`;
+  });
+  html += `<tr style="font-weight:bold;"><td colspan="2">Total</td><td>${totalF}</td><td>${totalM}</td></tr></tbody></table>`;
+  document.getElementById("clusterwiseTable").innerHTML = html;
+}
+
+async function showCastewiseReport() {
+  document.getElementById("reportsMenu").style.display = "none";
+  document.getElementById("clusterwiseReport").style.display = "none";
+  document.getElementById("castewiseReport").style.display = "block";
+
+  const username = currentUser.email.split("@")[0];
+  const { data, error } = await supabaseClient
+    .from("family_members")
+    .select('Caste,"HH ID"')
+    .eq("username", username)
+    .range(0, 9999);
+    
+
+
+  if (error) { console.error(error); return; }
+
+  const castes = ["BC-A","BC-B","BC-C","BC-D","BC-E","OC","SC","ST","Blank"];
+  const casteStats = {};
+  const seenFamilies = new Set();         // for total unique families
+  const seenFamiliesPerCaste = {};        // for per-caste unique families
+
+
+castes.forEach(c => {
+    casteStats[c] = { families: 0, members: 0 };
+    seenFamiliesPerCaste[c] = new Set();
+  });
+
+  data.forEach(row => {
+    // Handle blank or null caste
+    let c = row["Caste"];
+    if (!c || c.trim() === "") c = "Blank";
+
+    const hh = row["HH ID"];
+    if (!casteStats[c]) {
+      casteStats[c] = { families: 0, members: 0 };
+      seenFamiliesPerCaste[c] = new Set();
+    }
+
+    casteStats[c].members++;
+
+    if (!seenFamiliesPerCaste[c].has(hh)) {
+      seenFamiliesPerCaste[c].add(hh);
+      casteStats[c].families++;
+    }
+
+    seenFamilies.add(hh); // count globally
+  });
+
+  const totalF = seenFamilies.size;
+  const totalM = data.length;
+
+  let sno = 1;
+  let html = `<table><thead><tr><th>S.No</th><th>Caste</th><th>No. of Families</th><th>No. of Members</th></tr></thead><tbody>`;
+  castes.forEach(c => {
+    const s = casteStats[c];
+    // Only print rows that actually have families or members
+    if (s.families > 0 || s.members > 0) {
+      html += `<tr><td>${sno++}</td><td>${c}</td><td>${s.families}</td><td>${s.members}</td></tr>`;
+    }
+  });
+  html += `<tr style="font-weight:bold;"><td colspan="2">Total</td><td>${totalF}</td><td>${totalM}</td></tr></tbody></table>`;
+
+  document.getElementById("castewiseTable").innerHTML = html;
 }
 
 function displayPensionTiles() {
@@ -955,74 +1317,91 @@ function editPensionerPhNo(idx) {
 async function savePensionerPhNo(idx) {
   const p = filteredPensioners[idx];
   const newPhNo = document.getElementById("edit-pension-phno").value;
+  
   const { error } = await supabaseClient
     .from("family_members")
     .update({ "Ph No.": newPhNo })
     .eq("id", p.id);
+  
   if (error) {
     alert("Error: " + error.message);
     return;
   }
-  p["Ph No."] = newPhNo;
-  alert("Phone number updated!");
-  displayPensionClusterTable(idx);
+  
+  alert("Phone number updated! Refreshing...");
+  
+  // Force reload pensioner data
+  await fetchPensioners();
+  const newIdx = filteredPensioners.findIndex(pen => pen.id === p.id);
+  if(newIdx !== -1) {
+    displayPensionClusterTable(newIdx);
+  }
 }
 
 
+
 async function capturePensionLocation(idx) {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(async function(pos) {
-      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
-      if (sessionError || !sessionData.session) {
-        alert("⚠️ Session expired, please login again.");
-        logout();
-        return;
-      }
-
-      const lat = pos.coords.latitude.toFixed(15);
-      const lng = pos.coords.longitude.toFixed(15);
-      const accuracy = pos.coords.accuracy;
-
-      const pensioner = filteredPensioners[idx];
-      const updateObj = { lat, lng, geom: `SRID=4326;POINT(${lng} ${lat})` };
-
-      const { error } = await supabaseClient
-        .from("family_members")
-        .update(updateObj)
-        .eq("id", pensioner.id);
-
-      if (error) {
-        alert("Supabase update error: " + error.message);
-        return;
-      }
-
-      pensioner.lat = lat;
-      pensioner.lng = lng;
-      pensioner.geom = updateObj.geom;
-
-      alert(`✅ Pensioner location captured!\nAccuracy: ~${Math.round(accuracy)} meters`);
-      showPensionMap(idx);
-    }, function (err) {
-      if (err.code === 1) {
-        alert('Permission denied for location. Please check your browser settings.');
-      } else {
-        alert('Error getting location: ' + err.message);
-      }
-    }, {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0
-    });
-  } else {
+  if (!navigator.geolocation) {
     alert("Geolocation not supported");
+    return;
   }
+
+  navigator.geolocation.getCurrentPosition(async function(pos) {
+    const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+    if (sessionError || !sessionData.session) {
+      alert("⚠️ Session expired, please login again.");
+      logout();
+      return;
+    }
+
+    const lat = pos.coords.latitude.toFixed(15);
+    const lng = pos.coords.longitude.toFixed(15);
+    const accuracy = pos.coords.accuracy;
+
+    const pensioner = filteredPensioners[idx];
+    const updateObj = { 
+      lat, 
+      lng, 
+      geom: `SRID=4326;POINT(${lng} ${lat})` 
+    };
+
+    const { error } = await supabaseClient
+      .from("family_members")
+      .update(updateObj)
+      .eq("id", pensioner.id);
+
+    if (error) {
+      alert("Error: " + error.message);
+      return;
+    }
+
+    alert(`✅ Location captured!\nAccuracy: ~${Math.round(accuracy)}m\nRefreshing...`);
+    
+    // Force reload pensioner data
+    await fetchPensioners();
+    const newIdx = filteredPensioners.findIndex(p => p.id === pensioner.id);
+    if(newIdx !== -1) {
+      showPensionMap(newIdx);
+    }
+    
+  }, function (err) {
+    if (err.code === 1) {
+      alert('Permission denied. Please check browser settings.');
+    } else {
+      alert('Error: ' + err.message);
+    }
+  }, {
+    enableHighAccuracy: true,
+    timeout: 15000,
+    maximumAge: 0
+  });
 }
 
 function showPensionMap(idx, silent) {
   const pensioner = filteredPensioners[idx];
   let lat = pensioner.lat, lng = pensioner.lng;
   if(pensioner.geom && typeof pensioner.geom === "string" && pensioner.geom.startsWith("SRID=4326;POINT(")){
-    const coords = pensioner.geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/); // ✅ FIXED
+    const coords = pensioner.geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/); 
     if(coords){ lng = parseFloat(coords[1]); lat = parseFloat(coords[2]); }
   }
   const mapContainer = document.getElementById("pensionDetailMapContainer");
@@ -1101,33 +1480,143 @@ async function openManualPensionMap(idx){
 
     // Persistent login
     window.addEventListener("DOMContentLoaded", async ()=>{
-      const { data } = await supabaseClient.auth.getSession();
-      if(data.session){
-        currentUser = data.session.user;
-        showScreen("dashboardScreen");
-        subscribeRealtime();
-      }
-    });
+  const { data } = await supabaseClient.auth.getSession();
+  if(data.session){
+    currentUser = data.session.user;
+    const username = data.session.user.email.split('@')[0];
+    userClusterLimit = await fetchUserClusterLimit(username);
+    showScreen("dashboardScreen");
+    subscribeRealtime();
+    loadClusters(); // Load clusters for auto-login too
+  }
+});
+    // ============== ADD THESE NEW FUNCTIONS HERE ==============
+
+// Manual refresh function
+async function manualRefresh() {
+  const activeScreen = document.querySelector(".screen.active").id;
+  
+  console.log("Manual refresh triggered for:", activeScreen);
+
+  if (activeScreen === "clusterScreen") {
+    await loadClusterData();
+    alert("✅ Data refreshed!");
+  } 
+  else if (activeScreen === "membersScreen" && currentFamily) {
+    const hhId = currentFamily[0]["HH ID"];
+    const cluster = currentFamily[0]["Cluster Number"];
+    await loadClusterData();
+    showFamilyMembers(hhId, cluster);
+    alert("✅ Data refreshed!");
+  }
+  else if (activeScreen === "pensionScreen") {
+    await fetchPensioners();
+    alert("✅ Pensioners refreshed!");
+  }
+  else if (activeScreen === "pensionClusterScreen") {
+    await fetchPensioners();
+    alert("✅ Data refreshed!");
+  }
+  else if (activeScreen === "reportsScreen" &&
+           document.getElementById("clusterwiseReport").style.display === "block") {
+    await showClusterwiseReport();
+    alert("✅ Clusterwise report refreshed!");
+  }
+  else if (activeScreen === "reportsScreen" &&
+           document.getElementById("castewiseReport").style.display === "block") {
+    await showCastewiseReport();
+    alert("✅ Castewise report refreshed!");
+  }
+  else {
+    alert("Nothing to refresh on this screen");
+  }
+}
+
+// Note: clearAppCache is defined in the service worker registration
+// It's already added when you update the SW registration code
+
+// Offline/Online detection
+window.addEventListener('online', () => {
+  console.log('Back online');
+  manualRefresh();
+});
+
+window.addEventListener('offline', () => {
+  console.log('Gone offline');
+  alert('⚠️ You are offline. Some features may not work.');
+});
 
     // Supabase subscription for realtime updates
-    function subscribeRealtime(){
-      if(subscription) subscription.unsubscribe();
-      subscription = supabaseClient
-        .channel('family_members_changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'family_members' }, payload => {
-          // Reload cluster data if on cluster or members screen
-          if(document.getElementById("clusterScreen").classList.contains("active") || document.getElementById("membersScreen").classList.contains("active")){
-            loadClusterData();
+    function subscribeRealtime() {
+  if (subscription) subscription.unsubscribe();
+
+  subscription = supabaseClient
+    .channel('family_members_changes')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'family_members' },
+      async (payload) => {
+        console.log('Realtime update:', payload.eventType, payload.new?.id);
+
+        const activeScreen = document.querySelector(".screen.active").id;
+
+        if (activeScreen === "clusterScreen" || activeScreen === "membersScreen") {
+          console.log("Auto-refreshing cluster data...");
+          await loadClusterData();
+
+          if (activeScreen === "membersScreen" && currentFamily) {
+            const hhId = currentFamily[0]["HH ID"];
+            const cluster = currentFamily[0]["Cluster Number"];
+            if (payload.new &&
+                payload.new["HH ID"] === hhId &&
+                payload.new["Cluster Number"] === cluster) {
+              showFamilyMembers(hhId, cluster);
+            }
           }
-          // Reload pensioners if on pensioner screens
-          if(document.getElementById("pensionScreen").classList.contains("active") || document.getElementById("pensionClusterScreen").classList.contains("active")){
-            fetchPensioners();
+        }
+
+        if (activeScreen === "pensionScreen" || activeScreen === "pensionClusterScreen") {
+          if (payload.new && payload.new.pension_id) {
+            console.log("Auto-refreshing pensioner data...");
+            await fetchPensioners();
           }
-        })
-        .subscribe();
-    }
+        }
+
+        if (activeScreen === "reportsScreen") {
+          if (document.getElementById("clusterwiseReport").style.display === "block") {
+            showClusterwiseReport();
+          }
+          if (document.getElementById("castewiseReport").style.display === "block") {
+            showCastewiseReport();
+          }
+        }
+      }   // ✅ closes the async callback
+    )     // ✅ closes the .on( … )
+    .subscribe((status) => {
+      console.log("Realtime subscription status:", status);
+    });
+}
   </script>
-  <div id="manualMapModal" class="manual-modal">
+ 
+<script>
+  window.addEventListener("load", () => {
+    // Check if we've already shown splash in this session
+    if (sessionStorage.getItem('splashShown') === 'true') {
+      // Skip splash screen
+      document.getElementById("splashScreen").style.display = "none";
+      document.getElementById("app").style.display = "block";
+    } else {
+      // Show splash screen only once per session
+      setTimeout(() => {
+        document.getElementById("splashScreen").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        sessionStorage.setItem('splashShown', 'true');
+      }, 4000);
+    }
+  });
+</script>
+</div>
+ <div id="manualMapModal" class="manual-modal">
   <div class="manual-modal-content">
     <div style="padding:8px;display:flex;justify-content:space-between;align-items:center;background:#f7f7f7;">
       <strong>Adjust Location</strong>
@@ -1139,15 +1628,6 @@ async function openManualPensionMap(idx){
     <div id="manualMap" style="width:100%;height:400px"></div>
     <div id="manualMapCoords" style="padding:8px;font-size:12px;color:#444;"></div>
   </div>
-</div>
-<script>
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      document.getElementById("splashScreen").style.display = "none";
-      document.getElementById("app").style.display = "block";
-    }, 4000); // splash lasts 4s with animations
-  });
-</script>
 </div>
 </body>
 </html>
