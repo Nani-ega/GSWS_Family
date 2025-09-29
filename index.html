@@ -9,8 +9,24 @@
   <link rel="icon" href="assets/icons/icon-192.png" />
   <link rel="apple-touch-icon" href="assets/icons/icon-512.png" />
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/env.js"></script>
+<script src="assets/supabase.min.js"></script>
+<script src="/env.js"></script>
+<script>
+  // Verify everything loaded
+  console.log('Supabase library:', typeof supabase);
+  console.log('Env config:', window.env);
+  
+  // Initialize client immediately
+  if (window.env && window.env.SUPABASE_URL && window.env.SUPABASE_ANON_KEY) {
+    window.supabaseClient = supabase.createClient(
+      window.env.SUPABASE_URL, 
+      window.env.SUPABASE_ANON_KEY
+    );
+    console.log('✅ Supabase client initialized');
+  } else {
+    console.error('❌ Missing env variables');
+  }
+</script>
 
     <!-- Leaflet CSS/JS loaded up-front for reliability -->
    <link rel="stylesheet" href="assets/leaflet.css" />
@@ -396,9 +412,13 @@ display: flex; flex-direction: column; gap: 18px; margin-top: 8px; } .pension-ti
   });
 
 }
-    const SUPABASE_URL = window.env.SUPABASE_URL;
-    const SUPABASE_KEY = window.env.SUPABASE_ANON_KEY; 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Use the pre-initialized client
+const supabaseClient = window.supabaseClient;
+
+if (!supabaseClient) {
+  console.error('❌ Supabase client not initialized');
+  alert('Configuration error. Please contact support.');
+}
 
     let familyData = [], familiesMap = {}, currentCluster = null, currentFamily = null, subscription = null;
 
@@ -1631,4 +1651,5 @@ window.addEventListener('offline', () => {
 </div>
 </body>
 </html>
+
 
