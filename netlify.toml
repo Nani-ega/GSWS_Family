@@ -1,7 +1,11 @@
 [build]
   publish = "."
-  command = "cp env.template.js env.js && sed -i 's|%%SUPABASE_URL%%|'$SUPABASE_URL'|g; s|%%SUPABASE_ANON_KEY%%|'$SUPABASE_ANON_KEY'|g' env.js"
-
+  command = """
+    echo 'window.env = {' > env.js
+    echo '  SUPABASE_URL: \"'$SUPABASE_URL'\",' >> env.js
+    echo '  SUPABASE_ANON_KEY: \"'$SUPABASE_ANON_KEY'\"' >> env.js
+    echo '};' >> env.js
+  """
 # Critical: Prevent caching of dynamic content
 [[headers]]
   for = "/env.js"
@@ -85,3 +89,4 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
